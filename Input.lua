@@ -173,10 +173,15 @@ function Input:down(action, interval, delay)
         end
 
     elseif action and not interval and not delay then
+        local status = false
+        local isDown = false
+        --Using pcall because key_constant is not latest and isDown would raise exception when key_constant is error.
         for _, key in ipairs(self.binds[action]) do
-            if (love.keyboard.isDown(key) or love.mouse.isDown(key_to_button[key] or 0)) then
-                return true
-            end
+            status, isDown = pcall(love.keyboard.isDown, key)
+            if status and isDown then return true end
+
+            status, isDown = pcall(love.mouse.isDown, key_to_button[key])
+            if status and isDown then return true end
             
             -- Supports only 1 gamepad, add more later...
             if self.joysticks[1] then
